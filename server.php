@@ -87,7 +87,7 @@ if (isset($_GET['getDisorder'])){
 if (isset($_POST['register'])) {
     $email = trim($_POST['email']);
     $uname = trim($_POST['username']);
-    $pw    = $_POST['password'];
+    $pw = $_POST['password'];
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         sendReposne('error', 'invalid email format');
@@ -99,8 +99,7 @@ if (isset($_POST['register'])) {
     $stmt = $mysqli->prepare(
         "INSERT INTO users (Username, Email, pasword) VALUES (?, ?, ?)"
     );
-    $hashed = password_hash($pw, PASSWORD_DEFAULT);
-    $stmt->bind_param('sss', $uname, $email, $hashed);
+    $stmt->bind_param('sss', $uname, $email, $pw);
 
     if ($stmt->execute()) {
         $_SESSION['user_id'] = $mysqli->insert_id;
@@ -113,20 +112,15 @@ if (isset($_POST['register'])) {
 
 if (isset($_POST['login'])) {
     $uname = trim($_POST['username']);
-    $pw    = $_POST['password'];
-
-    $stmt = $mysqli->prepare(
-        "SELECT id, Username, pasword FROM users WHERE Username = ?"
-    );
+    $pw = $_POST['password'];
+    $stmt = $mysqli->prepare("SELECT U_id, Username, pasword FROM users WHERE Username = ?");
     $stmt->bind_param('s', $uname);
     $stmt->execute();
     $stmt->store_result();
-
     if ($stmt->num_rows === 1) {
-        $stmt->bind_result($id, $dbUname, $hash);
+        $stmt->bind_result($id, $dbUname, $pw);
         $stmt->fetch();
-
-        if (password_verify($pw, $hash)) {
+        if (($pw == $hash)) {
             $_SESSION['user_id'] = $id;
             sendReposne('success', 'Login successful');
         } else {

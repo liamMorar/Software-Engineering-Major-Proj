@@ -101,8 +101,8 @@ function login(username, password) {
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                console.log('Login successful');
-                window.location.href = 'index.html';
+                console.log(data);
+//                window.location.href = 'index.html';
             } else {
                 console.warn('Login failed:', data.message);
             }
@@ -136,8 +136,4 @@ function register(username, email, password) {
             }
             return data;
         })
-        .catch(err => {
-            console.error('Registration error:', err);
-            throw err;
-        });
 }
